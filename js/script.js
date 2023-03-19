@@ -107,13 +107,16 @@ window.addEventListener('DOMContentLoaded', () => {
         modal = document.querySelector('.modal'),
         closeBtn = modal.querySelector('[data-close]');
 
+    // открытие окна на классах + отмена скролла для страницы за окном
     function openModal() {
         modal.classList.toggle('show');
         document.body.style.overflow = 'hidden';
     }
 
+    // открытие модального окна через 15 сек после захода на сайт
     const modalTimer = setTimeout(openModal, 15000);
 
+    // открытие модального окна при наадатии на кнопку связаться с нами. Если пользователь самостоятельно открывает окно, снимаем открытие через 15 сек
     modalBtn.forEach((btn) => {
         btn.addEventListener('click', () => {
             openModal();
@@ -121,25 +124,30 @@ window.addEventListener('DOMContentLoaded', () => {
         })
     })
 
+    // закрытие окна
     function closeModal() {
         modal.classList.toggle('show');
         document.body.style.overflow = '';
     }
 
+    // закрытие по нажатию кнопки закрыть 
     closeBtn.addEventListener('click', closeModal)
 
+    // закрытие по нажатию по пустому пространству
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
             closeModal();
         }
     })
 
+    // закрытие по Escape
     document.addEventListener('keydown', (e) => {
         if (e.code === 'Escape' && modal.classList.contains('show')) {
             closeModal();
         }
     })
 
+    // закрытие по достижению конца страницы
     function showModalbyScroll() {
         if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight - 1) {
             openModal();
@@ -149,9 +157,56 @@ window.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('scroll', showModalbyScroll)
 
+    // menu
+    const menu = document.querySelector('.menu__field .container');
+
+    // класс для карточек с меню
+    class MenuItem {
+        constructor(img, alt, title, text, price) {
+            this.img = img;
+            this.alt = alt; 
+            this.title = title; 
+            this.text = text; 
+            this.price = price; 
+        }
+
+        showMenuItem(selector) {
+            const menuItem = document.createElement('div');
+            menuItem.classList.add('menu__item');
+            menuItem.innerHTML =
+            `<img src=${this.img} alt=${this.alt}>
+            <h3 class="menu__item-subtitle">${this.title}</h3>
+            <div class="menu__item-descr">${this.text}</div>
+            <div class="menu__item-divider"></div>
+            <div class="menu__item-price">
+                <div class="menu__item-cost">Цена:</div>
+                <div class="menu__item-total"><span>${this.price}</span> руб/день</div>
+            </div>`;
+            selector.prepend(menuItem);
+        }
+    }
+
+    // карточки 
+    const fitnesMenu = new MenuItem(
+        'img/tabs/vegy.jpg', 
+        'vegy', 'Меню "Фитнес"', 
+        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!', 
+        '229');
+    const premiumMenu = new MenuItem(
+        'img/tabs/elite.jpg', 
+        'elite', 'Меню “Премиум”', 
+        'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!', 
+        '550');
+    const postMenu = new MenuItem(
+        'img/tabs/post.jpg', 
+        'post', 'Меню "Постное"', 
+        'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.', 
+        '430');
     
-
-
+    // показ карточек на сайт
+    fitnesMenu.showMenuItem(menu);
+    premiumMenu.showMenuItem(menu);
+    postMenu.showMenuItem(menu);
 
 
 
