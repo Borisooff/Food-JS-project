@@ -42,7 +42,7 @@ window.addEventListener('DOMContentLoaded', () => {
     })
     // timer 
 
-    const deadLine = '2023-03-19';
+    const deadLine = '2023-05-20';
 
     //расчет оставшегося времени до нужной даты в дняхб часах, минутах и секундах 
     function timeRemaining(endtime) {
@@ -162,19 +162,24 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // класс для карточек с меню
     class MenuItem {
-        constructor(img, alt, title, text, price) {
+        constructor(img, alt, title, text, price, ...classes) {
             this.img = img;
-            this.alt = alt; 
-            this.title = title; 
-            this.text = text; 
-            this.price = price; 
+            this.alt = alt;
+            this.title = title;
+            this.text = text;
+            this.price = price;
+            this.classes = classes;
         }
 
         showMenuItem(selector) {
             const menuItem = document.createElement('div');
-            menuItem.classList.add('menu__item');
+            if (this.classes.length === 0) {
+                menuItem.classList.add('menu__item');
+            } else {
+                this.classes.forEach(className => menuItem.classList.add(className));
+            }
             menuItem.innerHTML =
-            `<img src=${this.img} alt=${this.alt}>
+                `<img src=${this.img} alt=${this.alt}>
             <h3 class="menu__item-subtitle">${this.title}</h3>
             <div class="menu__item-descr">${this.text}</div>
             <div class="menu__item-divider"></div>
@@ -188,27 +193,70 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // карточки 
     const fitnesMenu = new MenuItem(
-        'img/tabs/vegy.jpg', 
-        'vegy', 'Меню "Фитнес"', 
-        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!', 
-        '229');
-    const premiumMenu = new MenuItem(
-        'img/tabs/elite.jpg', 
-        'elite', 'Меню “Премиум”', 
-        'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!', 
-        '550');
-    const postMenu = new MenuItem(
-        'img/tabs/post.jpg', 
-        'post', 'Меню "Постное"', 
-        'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.', 
-        '430');
-    
+        'img/tabs/vegy.jpg',
+        'vegy', 'Меню "Фитнес"',
+        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
+        '229',
+        'menu__item'),
+        premiumMenu = new MenuItem(
+            'img/tabs/elite.jpg',
+            'elite', 'Меню “Премиум”',
+            'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
+            '550',
+            'menu__item'),
+        postMenu = new MenuItem(
+            'img/tabs/post.jpg',
+            'post', 'Меню "Постное"',
+            'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
+            '430',
+            'menu__item');
+
     // показ карточек на сайт
     fitnesMenu.showMenuItem(menu);
     premiumMenu.showMenuItem(menu);
     postMenu.showMenuItem(menu);
 
+    // forms
+    const forms = document.querySelectorAll('form'),
+        message = {
+            success: 'Спасибо! Скоро мы с вами свяжемся',
+            loading: 'Форма отправляется',
+            error: 'Произошла ошибка. Попробуйте позже',
+        };
 
+    function postData(form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const request = new XMLHttpRequest(),
+                formData = new FormData(form),
+                statusMessage = document.createElement('div');
+            statusMessage.classList.add('status');
+            statusMessage.textContent = message.loading;
+            form.append(statusMessage);
+
+            request.open('POST', 'server.php');
+
+            request.send(formData);
+            request.addEventListener('load', () => {
+                if (request.status === 200) {
+                    console.log('success');
+                    statusMessage.textContent = message.success;
+                    form.reset();
+                    setTimeout(() => {
+                        statusMessage.remove();
+                    }, 1500);
+                } else {
+                    console.log('error');
+                    statusMessage.textContent = message.error;
+                }
+            })
+        })
+    }
+
+    forms.forEach(form => {
+        postData(form);
+    })
 
 
 
