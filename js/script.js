@@ -104,17 +104,17 @@ window.addEventListener('DOMContentLoaded', () => {
     // modal 
 
     const modalBtn = document.querySelectorAll('[data-modal]'),
-        modal = document.querySelector('.modal'),
-        closeBtn = modal.querySelector('[data-close]');
+        modal = document.querySelector('.modal');
 
     // открытие окна на классах + отмена скролла для страницы за окном
     function openModal() {
-        modal.classList.toggle('show');
+        modal.classList.remove('hide');
+        modal.classList.add('show');
         document.body.style.overflow = 'hidden';
     }
 
     // открытие модального окна через 15 сек после захода на сайт
-    const modalTimer = setTimeout(openModal, 15000);
+    const modalTimer = setTimeout(openModal, 50000);
 
     // открытие модального окна при наадатии на кнопку связаться с нами. Если пользователь самостоятельно открывает окно, снимаем открытие через 15 сек
     modalBtn.forEach((btn) => {
@@ -126,16 +126,14 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // закрытие окна
     function closeModal() {
-        modal.classList.toggle('show');
+        modal.classList.remove('show');
+        modal.classList.add('hide');
         document.body.style.overflow = '';
     }
 
-    // закрытие по нажатию кнопки закрыть 
-    closeBtn.addEventListener('click', closeModal)
-
-    // закрытие по нажатию по пустому пространству
+    // закрытие по нажатию по пустому пространству или элименту с атрибутом 
     modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
+        if (e.target === modal || e.target.getAttribute('data-close') === '') {
             closeModal();
         }
     })
@@ -220,35 +218,35 @@ window.addEventListener('DOMContentLoaded', () => {
     const forms = document.querySelectorAll('form'),
         message = {
             success: 'Спасибо! Скоро мы с вами свяжемся',
-            loading: 'Форма отправляется',
+            loading: 'img/form/005 spinner.svg',
             error: 'Произошла ошибка. Попробуйте позже',
         };
 
+    // отправка форм на сервер. формы получаются через FormFata сервер на php 
     function postData(form) {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
             const request = new XMLHttpRequest(),
                 formData = new FormData(form),
-                statusMessage = document.createElement('div');
-            statusMessage.classList.add('status');
-            statusMessage.textContent = message.loading;
-            form.append(statusMessage);
-
+                statusMessage = document.createElement('img');
+            statusMessage.src = message.loading;
+            statusMessage.style.cssText = `
+            display: block;
+            margin: 0 auto;
+            `;
+            form.insertAdjacentElement('afterend', statusMessage);
             request.open('POST', 'server.php');
 
             request.send(formData);
             request.addEventListener('load', () => {
                 if (request.status === 200) {
                     console.log('success');
-                    statusMessage.textContent = message.success;
+                    showThanksModal(message.success);
                     form.reset();
-                    setTimeout(() => {
-                        statusMessage.remove();
-                    }, 1500);
+                    statusMessage.remove();
                 } else {
-                    console.log('error');
-                    statusMessage.textContent = message.error;
+                    showThanksModal(message.error);
                 }
             })
         })
@@ -257,6 +255,29 @@ window.addEventListener('DOMContentLoaded', () => {
     forms.forEach(form => {
         postData(form);
     })
+
+    function showThanksModal(message) {
+        const prevModalDilog = document.querySelector('.modal__dialog');
+        prevModalDilog.classList.remove('show');
+        prevModalDilog.classList.add('hide');
+        openModal();
+
+        const thanksModal = document.createElement('div');
+        thanksModal.classList.add('modal__dialog');
+        thanksModal.innerHTML = `
+        <div class="modal__content">
+            <div class="modal__title">${message}</div>
+            <div data-close class="modal__close">×</div>
+        </div>`
+        document.querySelector('.modal').append(thanksModal);
+
+        setTimeout(() => {
+            thanksModal.remove();
+            prevModalDilog.classList.add('show');
+            prevModalDilog.classList.remove('hide');
+            closeModal();
+        }, 2000)
+    }
 
 
 
