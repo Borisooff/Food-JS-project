@@ -158,6 +158,15 @@ window.addEventListener('DOMContentLoaded', () => {
     // menu
     const menu = document.querySelector('.menu__field .container');
 
+
+    const getData = async (url) => {
+        const res = await fetch(url);
+        if (!res.ok) {
+            throw new Error(`Could not fetch ${url}, status: ${res.status}`)
+        }
+        return await res.json();
+    }
+
     // класс для карточек с меню
     class MenuItem {
         constructor(img, alt, title, text, price, ...classes) {
@@ -168,7 +177,6 @@ window.addEventListener('DOMContentLoaded', () => {
             this.price = price;
             this.classes = classes;
         }
-
         showMenuItem(selector) {
             const menuItem = document.createElement('div');
             if (this.classes.length === 0) {
@@ -183,36 +191,19 @@ window.addEventListener('DOMContentLoaded', () => {
             <div class="menu__item-divider"></div>
             <div class="menu__item-price">
                 <div class="menu__item-cost">Цена:</div>
-                <div class="menu__item-total"><span>${this.price}</span> руб/день</div>
+                <div class="menu__item-total"><span>${this.price}</span> $/день</div>
             </div>`;
             selector.prepend(menuItem);
         }
     }
 
-    // карточки 
-    const fitnesMenu = new MenuItem(
-        'img/tabs/vegy.jpg',
-        'vegy', 'Меню "Фитнес"',
-        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-        '229',
-        'menu__item'),
-        premiumMenu = new MenuItem(
-            'img/tabs/elite.jpg',
-            'elite', 'Меню “Премиум”',
-            'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-            '550',
-            'menu__item'),
-        postMenu = new MenuItem(
-            'img/tabs/post.jpg',
-            'post', 'Меню "Постное"',
-            'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
-            '430',
-            'menu__item');
+    getData('http://localhost:3000/menu')
+        .then(data => {
+            data.forEach(({ img, altimg, title, descr, price }) => {
+                new MenuItem(img, altimg, title, descr, price, 'menu__item').showMenuItem(menu);
+            })
+        })
 
-    // показ карточек на сайт
-    fitnesMenu.showMenuItem(menu);
-    premiumMenu.showMenuItem(menu);
-    postMenu.showMenuItem(menu);
 
     // forms
     const forms = document.querySelectorAll('form'),
@@ -222,40 +213,51 @@ window.addEventListener('DOMContentLoaded', () => {
             error: 'Произошла ошибка. Попробуйте позже',
         };
 
-    // отправка форм на сервер. формы получаются через FormFata сервер на php 
-    function postData(form) {
+    const postData = async (url, data) => {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: data,
+        });
+        return await res.json();
+    }
+
+    // отправка форм на сервер. формы получаются через FormFata
+    function bindPostData(form) {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
-            const request = new XMLHttpRequest(),
-                formData = new FormData(form),
-                statusMessage = document.createElement('img');
+            const statusMessage = document.createElement('img');
             statusMessage.src = message.loading;
             statusMessage.style.cssText = `
             display: block;
             margin: 0 auto;
             `;
             form.insertAdjacentElement('afterend', statusMessage);
-            request.open('POST', 'server.php');
 
-            request.send(formData);
-            request.addEventListener('load', () => {
-                if (request.status === 200) {
-                    console.log('success');
+            const formData = new FormData(form),
+                json = JSON.stringify(Object.fromEntries(formData.entries()));
+
+            postData('http://localhost:3000/requests', json)
+                .then(data => {
+                    console.log(data);
                     showThanksModal(message.success);
-                    form.reset();
                     statusMessage.remove();
-                } else {
+                }).catch(() => {
                     showThanksModal(message.error);
-                }
-            })
-        })
+                }).finally(() => {
+                    form.reset();
+                });
+        });
     }
 
     forms.forEach(form => {
-        postData(form);
+        bindPostData(form);
     })
 
+    //показ модального окна после заполнения формы
     function showThanksModal(message) {
         const prevModalDilog = document.querySelector('.modal__dialog');
         prevModalDilog.classList.remove('show');
@@ -280,7 +282,9 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
 
-
+    // fetch('http://localhost:3000/menu')
+    //     .then(data => data.json())
+    //     .then(res => console.log(res));
 
 
 
