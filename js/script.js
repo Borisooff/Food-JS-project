@@ -158,7 +158,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // menu
     const menu = document.querySelector('.menu__field .container');
 
-
+    //функция запроса данных с json сервера возвращает объект в нормальном виде или ошибку по статусу
     const getData = async (url) => {
         const res = await fetch(url);
         if (!res.ok) {
@@ -197,6 +197,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    //получение карточек с сервера и добавление их на страницу 
     getData('http://localhost:3000/menu')
         .then(data => {
             data.forEach(({ img, altimg, title, descr, price }) => {
@@ -213,6 +214,7 @@ window.addEventListener('DOMContentLoaded', () => {
             error: 'Произошла ошибка. Попробуйте позже',
         };
 
+    // функция отпраки данных на json сервер 
     const postData = async (url, data) => {
         const res = await fetch(url, {
             method: 'POST',
@@ -281,11 +283,42 @@ window.addEventListener('DOMContentLoaded', () => {
         }, 2000)
     }
 
+    // slider
+    const slides = document.querySelectorAll('.offer__slide'),
+        sliderPrevBtn = document.querySelector('.offer__slider-prev'),
+        sliderNextBtn = document.querySelector('.offer__slider-next'),
+        curentSlide = document.querySelector('#current'),
+        totalSlides = document.querySelector('#total');
+    let slideIndex = 0;
 
-    // fetch('http://localhost:3000/menu')
-    //     .then(data => data.json())
-    //     .then(res => console.log(res));
+    showSlide(slideIndex);
 
+    function showSlide(i) {
+        totalSlides.innerHTML = getZero(slides.length);
+        curentSlide.textContent = getZero(i + 1);
+        slides.forEach((slide) => {
+            slide.classList.remove('show');
+            slide.classList.add('hide');
+        })
+        slides[i].classList.add('fade');
+        slides[i].classList.add('show');
+    }
+
+    sliderPrevBtn.addEventListener('click', () => {
+        slideIndex--;
+        if (slideIndex < 0) {
+            slideIndex = slides.length - 1;
+        }
+        showSlide(slideIndex);
+    });
+
+    sliderNextBtn.addEventListener('click', () => {
+        slideIndex++;
+        if (slideIndex >= slides.length) {
+            slideIndex = 0;
+        }
+        showSlide(slideIndex);
+    });
 
 
 
