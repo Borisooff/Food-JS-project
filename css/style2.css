@@ -20,3 +20,12 @@
         opacity: 1;
     }
 }
+
+.slider__line {
+    display: flex;
+    transition: all .3s ease-in-out;
+}
+
+.offer__slider-wrapper {
+    overflow: hidden;
+}

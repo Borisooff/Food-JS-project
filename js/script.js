@@ -284,41 +284,69 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     // slider
-    const slides = document.querySelectorAll('.offer__slide'),
+    const sliderWrapper = document.querySelector('.offer__slider-wrapper'),
+        slides = sliderWrapper.querySelectorAll('.offer__slide'),
         sliderPrevBtn = document.querySelector('.offer__slider-prev'),
         sliderNextBtn = document.querySelector('.offer__slider-next'),
         curentSlide = document.querySelector('#current'),
-        totalSlides = document.querySelector('#total');
-    let slideIndex = 0;
+        totalSlides = document.querySelector('#total'),
+        slidrLine = sliderWrapper.querySelector('.slider__line'),
+        wrapperWidth = window.getComputedStyle(sliderWrapper).width;
+    let slideIndex = 1,
+        offset = 0;
 
-    showSlide(slideIndex);
+    // показывает общее колличество слайдов и номер текущего слайда функция getZero добавляет 0 перед цифрой если она меньше 10
+    totalSlides.innerHTML = getZero(slides.length);
+    curentSlide.innerHTML = getZero(slideIndex);
 
-    function showSlide(i) {
-        totalSlides.innerHTML = getZero(slides.length);
-        curentSlide.textContent = getZero(i + 1);
-        slides.forEach((slide) => {
-            slide.classList.remove('show');
-            slide.classList.add('hide');
-        })
-        slides[i].classList.add('fade');
-        slides[i].classList.add('show');
-    }
+    // sliderLine равен длине всех слайдов в процентах. каждый слайд равен ширине окна показа
+    slidrLine.style.width = 100 * slides.length + '%';
+    slides.forEach((slide) => {
+        slide.style.width = wrapperWidth;
+    })
 
-    sliderPrevBtn.addEventListener('click', () => {
-        slideIndex--;
-        if (slideIndex < 0) {
-            slideIndex = slides.length - 1;
-        }
-        showSlide(slideIndex);
-    });
-
+    // переключение слайдов вперед (slider line двигается влево на ширину слайда)
     sliderNextBtn.addEventListener('click', () => {
-        slideIndex++;
-        if (slideIndex >= slides.length) {
-            slideIndex = 0;
+        if (offset == +wrapperWidth.slice(0, wrapperWidth.length - 2) * (slides.length - 1)) {
+            offset = 0;
+            slideIndex = 1;
+        } else {
+            offset += +wrapperWidth.slice(0, wrapperWidth.length - 2);
+            slideIndex++
         }
-        showSlide(slideIndex);
-    });
+        curentSlide.textContent = getZero(slideIndex);
+        slidrLine.style.transform = `translateX(-${offset}px)`;
+    })
+
+    // переключение слайда назад (двигается вправо)
+    sliderPrevBtn.addEventListener('click', () => {
+        if (offset == 0) {
+            offset = +wrapperWidth.slice(0, wrapperWidth.length - 2) * (slides.length - 1);
+            slideIndex = slides.length;
+        } else {
+            offset -= +wrapperWidth.slice(0, wrapperWidth.length - 2);
+            slideIndex--;
+        }
+        curentSlide.textContent = getZero(slideIndex);
+        slidrLine.style.transform = `translateX(-${offset}px)`;
+    })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
