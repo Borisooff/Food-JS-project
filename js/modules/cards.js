@@ -1,14 +1,7 @@
+import { getData } from "../services/getData";
+
 function cards() {
     const menu = document.querySelector('.menu__field .container');
-
-    //функция запроса данных с json сервера возвращает объект в нормальном виде или ошибку по статусу
-    const getData = async (url) => {
-        const res = await fetch(url);
-        if (!res.ok) {
-            throw new Error(`Could not fetch ${url}, status: ${res.status}`)
-        }
-        return await res.json();
-    }
 
     // класс для карточек с меню
     class MenuItem {
@@ -49,4 +42,4 @@ function cards() {
         })
 }
 
-module.exports = cards;
+export default cards;

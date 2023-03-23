@@ -1,5 +1,13 @@
-function timer() {
-    const deadLine = '2023-05-20';
+//  добавляет 0 когда число меньше 10 
+function getZero(num) {
+    if (num >= 0 && num < 10) {
+        return `0${num}`;
+    } else {
+        return num;
+    }
+}
+
+function timer(timerId, deadLine) {
 
     //расчет оставшегося времени до нужной даты в дняхб часах, минутах и секундах 
     function timeRemaining(endtime) {
@@ -21,15 +29,6 @@ function timer() {
             'minutes': minutes,
             'seconds': seconds,
         };
-    }
-
-    //  добавляет 0 когда число меньше 10 
-    function getZero(num) {
-        if (num >= 0 && num < 10) {
-            return `0${num}`;
-        } else {
-            return num;
-        }
     }
 
     // получет объекты по id внутри нжного селектора. добавляет в эти теги данные из функции оставшегося вресени. обновляет данные каждую секунду 
@@ -56,7 +55,8 @@ function timer() {
         }
     }
 
-    setTimer('.timer', deadLine)
+    setTimer(timerId, deadLine)
 }
 
-module.exports = timer;
+export default timer;
+export { getZero };

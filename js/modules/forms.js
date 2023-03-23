@@ -1,3 +1,6 @@
+import { closeModal, openModal } from "./modal";
+import { postData } from "../services/postData";
+
 function forms() {
     const forms = document.querySelectorAll('form'),
         message = {
@@ -5,18 +8,6 @@ function forms() {
             loading: 'img/form/005 spinner.svg',
             error: 'Произошла ошибка. Попробуйте позже',
         };
-
-    // функция отпраки данных на json сервер 
-    const postData = async (url, data) => {
-        const res = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-type': 'application/json'
-            },
-            body: data,
-        });
-        return await res.json();
-    }
 
     // отправка форм на сервер. формы получаются через FormFata
     function bindPostData(form) {
@@ -56,7 +47,7 @@ function forms() {
         const prevModalDilog = document.querySelector('.modal__dialog');
         prevModalDilog.classList.remove('show');
         prevModalDilog.classList.add('hide');
-        openModal();
+        openModal('.modal');
 
         const thanksModal = document.createElement('div');
         thanksModal.classList.add('modal__dialog');
@@ -71,9 +62,9 @@ function forms() {
             thanksModal.remove();
             prevModalDilog.classList.add('show');
             prevModalDilog.classList.remove('hide');
-            closeModal();
+            closeModal('.modal');
         }, 2000)
     }
 }
 
-module.exports = forms;
+export default forms;
