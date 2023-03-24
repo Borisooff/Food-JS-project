@@ -63,7 +63,7 @@ function forms() {
             prevModalDilog.classList.add('show');
             prevModalDilog.classList.remove('hide');
             closeModal('.modal');
-        }, 2000)
+        }, 50000)
     }
 }
 

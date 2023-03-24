@@ -28,7 +28,7 @@ function tabs(tabsSelector, tabContentSelector, tabParantSelector, tabActiveClas
     // делигирует событие на нажатый элемент если он имеет нужный класс. по нажатию весь конткнт прячется, а нужный появляется
     tabWrapper.addEventListener('click', event => {
         const target = event.target;
-        if (target && target.classList.contains(tabsSelector.clice(1))) {
+        if (target && target.classList.contains(tabsSelector.slice(1))) {
             tabs.forEach((element, index) => {
                 if (element == target) {
                     hideTabs();
